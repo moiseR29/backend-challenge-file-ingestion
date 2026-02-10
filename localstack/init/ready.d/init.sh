@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -e
+echo "LOCALSTACK - Creating S3 bucket and SQS queue..."
+awslocal s3api create-bucket --bucket jobs --region us-east-1 || true
+awslocal sqs create-queue --queue-name jobs-queue --region us-east-1 || true
+awslocal s3api list-buckets
+awslocal sqs list-queues
+echo "LOCALSTACK - init done."
