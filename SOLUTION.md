@@ -7,12 +7,12 @@
 
 ## Descripción
 
-Aprovechando Kubernetes, mi solución esta basada en una arquitectura orientada a eventos, Por que ? mejor escalabilidad y mejor desacople de las partes.
-Por un lado el proceso de recibir el archivo y subirlo a un storage, para luego publicar segun logica de negocio en un queue para un proceso asincrono.
-Por otro lado un worker que escucha esta queue y va reaccionando segun los jobs comprendidos en la misma.
+Aprovechando Kubernetes, mi solución está basada en una arquitectura orientada a eventos. ¿Por qué? Mejor escalabilidad y mejor desacople de las partes.
+Por un lado, el proceso de recibir el archivo y subirlo a un storage, para luego publicar según lógica de negocio en un queue para un proceso asincrónico.
+Por otro lado, un worker que escucha esta queue y va reaccionando según los jobs comprendidos en la misma.
 
 Todo el entorno puede ejecutarse localmente usando Docker, simulando cloud con localstack.
-Toda la solución esta pensada para ejecutar localmente.
+Toda la solución está pensada para ejecutar localmente.
 
 ## Arquitectura
 
@@ -27,29 +27,29 @@ Toda la solución esta pensada para ejecutar localmente.
 
 ### Flujo
 
-1. [API] - Cliente envia el archivo a procesar a la Api.
-2. [API] - La Api analiza el archivo y lo guarda en el storage.
+1. [API] - Cliente envía el archivo a procesar a la API.
+2. [API] - La API analiza el archivo y lo guarda en el storage.
 3. [API] - Guarda la data correspondiente en las tablas Jobs y Chunks
 4. [API] - Publica cada Chunks a procesar en la queue
-5. [QUEUE] - Luego de un tiempo ( segun reglas de negocio ), pone disponible los chunks para ser procesados
-6. [WORKER] - El worker detecta que hay chunks por ser procesados, asi que los ejecuta
+5. [QUEUE] - Luego de un tiempo ( según reglas de negocio ), pone disponible los chunks para ser procesados.
+6. [WORKER] - El worker detecta que hay chunks por ser procesados, así que los ejecuta.
 7. [WORKER] - Una vez procesador lleva el informe a la tabla chunks.
 
 ### Aclaraciones del flujo
 
 #### AWS
-Si, me mayor experiencia esta con AWS, no tuve la oportunidad aun, de laburar con otro cloud. Si en principio con azure, pero fue muy muy casual.
+Sí, mi mayor experiencia está con AWS, no tuve la oportunidad aún de laburar con otro cloud. Sí, en principio con Azure, pero fue muy muy casual.
 
 #### "El worker detecta"
-Esto deberia ser una regla de kubernetes. He trabajado con Kubernetes ( no mucho ), pero se que se puede crear una regla configurada para escuchar al exterior y teniendo en cuenta la queue, que solo se creen los worker siempre y cuando existan en la queue.
-Yo iria por 1 chunk = 1 worker. Puede que se generen muchos ? si, pero tenes menor cuello de botella, esto obviamente depende mucho del analizis de infra, con respecto a datos, tiempo promedio de proceso y demas..
+Esto debería ser una regla de kubernetes. He trabajado con Kubernetes ( no mucho ), pero sé que se puede crear una regla configurada para escuchar al exterior y teniendo en cuenta la queue, que solo se creen los worker siempre y cuando existan en la queue.
+Yo iría por 1 chunk = 1 worker. ¿Puede que se generen muchos? Sí, pero tienes menor cuello de botella; esto obviamente depende mucho del análisis de infra, con respecto a datos, tiempo promedio de proceso y demás..
 
 #### "Una vez procesador lleva el informe a la tabla chunks"
-En la solucion provista no maneje los errores, simplemente se informan por consola.
-Pero con estos se podria crear alguna tabla con las lineas de errores, o enviar las lineas a un slack, se puede hacer muchas cosas, incluso llevarlar a alguna DLQ y algun lambda que las procese.
+En la solución provista no maneje los errores, simplemente se informan por consola.
+Pero con estos se podría crear alguna tabla con las líneas de errores, o enviar las líneas a un Slack, se puede hacer muchas cosas, incluso llevarlas a alguna DLQ y algún lambda que las procese.
 
 #### QUEUE
-La Queue por las reglas tiene 3 reintentos. Mas alla de eso, nos da un mejor control ya que son servicios que estan pensandos para este tipo de casos.
+La Queue por las reglas, tiene 3 reintentos. Más allá de eso, nos da un mejor control, ya que son servicios que están pensandos para este tipo de casos.
 
 #### Beneficios
 
@@ -57,7 +57,7 @@ La Queue por las reglas tiene 3 reintentos. Mas alla de eso, nos da un mejor con
 - Desacoplamiento
 - Escalabilidad horizontal
 
-## Ejecucion
+## Ejecución
 
 ### docker compose
 
@@ -96,7 +96,6 @@ curl --request POST \
 
 ## K8s
 
-como aclare en un principio, esto esta pensado para correr sobre kubernetes. la solucion la hice usando docker-compose, para facilitar la idea del desarrollo.
-Aclarado esto, no use mucho tiempo kubernetes, pero en la carpeta k8s, dejo como deberian ser los manifiestos para la ejecución.
-
+Como aclare en un principio, esto está pensado para correr sobre kubernetes. La solución la hice usando docker-compose, para facilitar la idea del desarrollo.
+Aclarado esto, no use mucho tiempo kubernetes, pero en la carpeta k8s, dejo como deberían ser los manifiestos para la ejecución.
 
