@@ -1,0 +1,53 @@
+{
+  "name": "api",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "Moises Rebatta <moiserebatta@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "./node_modules/.bin/tsc -p tsconfig.build.json",
+    "start:local": "yarn clean && yarn build && node ./dist/index.js",
+    "start": "node ./dist/index.js",
+    "lint": "./node_modules/.bin/eslint src/",
+    "prettier:check": "prettier --check \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.986.0",
+    "@aws-sdk/client-sqs": "^3.986.0",
+    "config": "^4.2.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.4",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "module-alias": "^2.3.4",
+    "moment-timezone": "^0.6.0",
+    "morgan": "^1.10.1",
+    "mssql": "^12.2.0",
+    "multer": "^2.0.2",
+    "uuid": "^13.0.0",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "@types/config": "^3.3.5",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/morgan": "^1.9.10",
+    "@types/mssql": "^9.1.9",
+    "@types/multer": "^2.0.0",
+    "@types/uuid": "^11.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.55.0",
+    "@typescript-eslint/parser": "^8.55.0",
+    "eslint": "^10.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-security": "^3.0.1",
+    "prettier": "^3.8.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "_moduleAliases": {
+    "@shared": "dist/shared",
+    "@jobs": "dist/jobs"
+  }
+}
