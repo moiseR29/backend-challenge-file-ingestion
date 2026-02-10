@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: backend-challenge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      containers:
+        - name: worker
+          image: backend-challenge-worker:local
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          env:
+            - name: NODE_ENV
+              value: "develop"
+            - name: DB_USER
+              value: sa
+            - name: DB_PASSWORD
+              value: "YourStrong!Passw0rd"
+            - name: DB_HOST
+              value: sqlserver.backend-challenge.svc.cluster.local
+            - name: DB_NAME
+              value: challenge
+            - name: AWS_REGION
+              value: us-east-1
+            - name: AWS_ACCESS_KEY_ID
+              value: test
+            - name: AWS_SECRET_ACCESS_KEY
+              value: test
+            - name: S3_BUCKET
+              value: jobs
+            - name: SQS_QUEUE_URL
+              value: http://localstack.backend-challenge.svc.cluster.local:4566/000000000000/jobs-queue
+            - name: SQS_ENDPOINT
+              value: http://localstack.backend-challenge.svc.cluster.local:4566
+

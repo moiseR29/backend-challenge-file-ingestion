@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sqlserver-schema
+  namespace: backend-challenge
+data:
+  schema.sql: |
+    USE master;
+    GO
+
+    IF EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = N'challenge')
+      DROP DATABASE challenge;
+    GO
+
+    CREATE DATABASE challenge;
+    GO
+
+    USE challenge;
+    GO
+
+    CREATE TABLE jobs (
+      job_id UNIQUEIDENTIFIER PRIMARY KEY,
+      file_path NVARCHAR(255),
+      created_at DATETIME DEFAULT GETDATE()
+    );
+
+    GO
+
+    CREATE TABLE job_chunks (
+      chunk_id UNIQUEIDENTIFIER PRIMARY KEY,
+      job_id UNIQUEIDENTIFIER,
+      from_line INT,
+      to_line INT,
+      status VARCHAR(20),
+      FOREIGN KEY (job_id) REFERENCES jobs(job_id)
+    );
+
+    GO
+
+    CREATE TABLE clientes (
+      id BIGINT IDENTITY(1,1) PRIMARY KEY,
+      NombreCompleto NVARCHAR(100) NOT NULL,
+      DNI BIGINT NOT NULL,
+      Estado VARCHAR(10) NOT NULL,
+      FechaIngreso DATE NOT NULL,
+      EsPEP BIT NOT NULL,
+      EsSujetoObligado BIT NULL,
+      FechaCreacion DATETIME NOT NULL DEFAULT GETDATE()
+    );
+
+    GO
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sqlserver-init
+  namespace: backend-challenge
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: sql-init
+          image: mcr.microsoft.com/mssql-tools
+          env:
+            - name: MSSQL_SA_PASSWORD
+              value: "YourStrong!Passw0rd"
+          command:
+            - /bin/bash
+            - -c
+            - |
+              echo "Waiting for SQL Server..."
+              for i in {1..30}; do
+                /opt/mssql-tools/bin/sqlcmd -S sqlserver,1433 -U sa -P "$MSSQL_SA_PASSWORD" -Q "SELECT 1" && break
+                sleep 2
+              done
+              echo "Applying schema..."
+              /opt/mssql-tools/bin/sqlcmd -S sqlserver,1433 -U sa -P "$MSSQL_SA_PASSWORD" -i /schema/schema.sql
+          volumeMounts:
+            - name: schema
+              mountPath: /schema
+      volumes:
+        - name: schema
+          configMap:
+            name: sqlserver-schema
+

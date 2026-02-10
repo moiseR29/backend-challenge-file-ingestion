@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: localstack
+  namespace: backend-challenge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: localstack
+  template:
+    metadata:
+      labels:
+        app: localstack
+    spec:
+      containers:
+        - name: localstack
+          image: localstack/localstack
+          ports:
+            - containerPort: 4566
+          env:
+            - name: SERVICES
+              value: s3,sqs
+            - name: AWS_DEFAULT_REGION
+              value: us-east-1
+            - name: AWS_ACCESS_KEY_ID
+              value: test
+            - name: AWS_SECRET_ACCESS_KEY
+              value: test
+          volumeMounts:
+            - name: localstack-init
+              mountPath: /etc/localstack/init/ready.d
+      volumes:
+        - name: localstack-init
+          configMap:
+            name: localstack-init
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: localstack
+  namespace: backend-challenge
+spec:
+  type: NodePort
+  selector:
+    app: localstack
+  ports:
+    - name: http
+      port: 4566
+      targetPort: 4566
+      nodePort: 30566
+
